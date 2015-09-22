@@ -1,0 +1,138 @@
+<html>
+<head>
+<style>
+body {margin: 0;}
+</style>
+</head>
+<body>
+<div id=test>
+</div>
+</body>
+<script>
+// create an auto resize 
+(function Install(element)
+{
+    console.log(element.offsetHeight);
+    console.log(element.offsetWidth);
+    var width = element.offsetWidth, height = element.offsetHeight;
+    // install canvas
+    var canvas = document.createElement('canvas');
+    canvas.style.position = 'absolute';
+    canvas.style.margin = 0;
+    canvas.style.width = width;
+    canvas.style.height = height;
+    // setttings
+    var text = 'HelloThisIsMatrixTestPage';
+    //var ripples = [];
+    var text_size = 10;
+    var wavelength = 10;
+    var ch = Math.floor(element.offsetHeight/text_size)+1;
+
+    // prepare data structure
+    var maps = []; // in sorted order
+    for(var i = 0 ; i < width / text_size + 1 ; i ++)
+        maps.push([]);
+
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0,0, width, height);
+    ctx.fillStyle = "#00FF00";
+    //ctx.font = /*(text_size-5)*/2 + 'px Arial';
+    ctx.textAlign="center"; 
+    ctx.font = '5px Georgia';
+    //ctx.fillText(text, 0, 20);
+    element.appendChild(canvas);
+
+    function RippleAt(x, y)
+    {
+        // x,y number from (0,0)
+        // ripples: 
+        //ripples += [];
+        var i = 0;
+        for(; i < maps[x].length && maps[x][i] < y ; i ++);
+        maps[x].splice(i, 0, y);
+    }
+
+    function UpdateFrame()
+    {
+        // update maps
+        for(var xi = 0, yj ; xi < maps.length ; xi ++)
+        {
+            for(yj = 0 ; yj < maps[xi].length && maps[xi][yj] <= ch; yj ++)
+                maps[xi][yj] += 1;
+            maps[xi].splice(yj, maps[xi].length-yj);
+        }
+        // draw maps
+        for(var xi = 0 ; xi < maps.length ; xi ++)
+        {
+            var yp = -1, yy;
+            var ymp = maps[xi];
+            function Next()
+            {
+                // get current yy
+                if(yp == -1 || yy == ymp[yp] + wavelength-1)
+                {
+                    for(yp ++; yp < ymp.length && ymp[yp] == ymp[yp-1]; yp ++);
+                    if(yp >= ymp.length) return [];
+                    yy = ymp[yp]-1;
+                    if(yp>0)
+                        yy = Math.max(yy, ymp[yp-1]+wavelength);
+                    return [yp, yy];
+                }
+                else
+                {
+                    yy += 1;
+                    return [yp, yy];
+                }
+            }
+            function decay(offset)
+            {
+                if(offset == -1) return 0;
+                return (wavelength - offset)*255/wavelength;
+            }
+            function ac(cur_int, next_int)
+            {
+                return Math.min(255, cur_int + next_int);
+            }
+            function update_char(x, y, i)
+            {
+                i = Math.floor(i);
+                // clear prev char
+                ctx.fillStyle = "#000000";
+                ctx.fillRect(text_size*x, text_size*y, text_size, text_size);
+                ctx.fillStyle = "rgb(0,"+i+",0)";
+                ctx.fillText(String.fromCharCode(Math.floor(Math.random()*254)), text_size*(x+0.5), (text_size)*(1+y));
+            }
+            for(var yj; (yj = Next()).length > 0;)
+            {
+                var intensity = 0;
+                // update to upper
+                for(var yk = yj[0]-1; yk >= 0 && ymp[yk]-1 <= yj[1] && yj[1] < ymp[yk] + wavelength; yk --)
+                    intensity = ac(intensity, decay(yj[1] - ymp[yk]));
+                // update to lower
+                for(var yk = yj[0]; yk < ymp.length && ymp[yk]-1 <= yj[1] && yj[1] < ymp[yk] + wavelength; yk ++)
+                    intensity = ac(intensity, decay(yj[1] - ymp[yk]));
+                update_char(xi, yj[1], intensity);
+            }
+        }
+    }
+    console.log(ch);
+
+    (function MainLoop()
+    {
+        // randomly add ripples
+        for(var i = 0 ; i < maps.length ; i ++)
+            if(Math.random()*10 < 1)
+                RippleAt(i, 0);
+            /*
+            if(maps[i].length <= 2)
+            {
+            }
+            */
+        UpdateFrame();
+        setTimeout(MainLoop, 200);
+    })();
+
+})(document.getElementsByTagName('body')[0]);
+</script>
+</html>
