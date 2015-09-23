@@ -12,9 +12,9 @@ body {margin: 0;}
 // create an auto resize 
 (function Install(element)
 {
-    console.log(element.offsetHeight);
-    console.log(element.offsetWidth);
-    var width = element.offsetWidth, height = element.offsetHeight;
+    console.log(element.clientHeight);
+    console.log(element.clientWidth);
+    var width = element.clientWidth, height = element.clientHeight;
     // install canvas
     var canvas = document.createElement('canvas');
     canvas.style.position = 'absolute';
@@ -26,7 +26,7 @@ body {margin: 0;}
     //var ripples = [];
     var text_size = 10;
     var wavelength = 10;
-    var ch = Math.floor(element.offsetHeight/text_size)+1;
+    var ch = Math.floor(element.clientHeight/text_size)+1;
 
     // prepare data structure
     var maps = []; // in sorted order
@@ -55,6 +55,7 @@ body {margin: 0;}
 
     function UpdateFrame()
     {
+        //console.log("update frame");
         // update maps
         for(var xi = 0, yj ; xi < maps.length ; xi ++)
         {
@@ -96,15 +97,19 @@ body {margin: 0;}
             }
             function update_char(x, y, i)
             {
+                //console.log(x + ", " + y);
                 i = Math.floor(i);
                 // clear prev char
-                ctx.fillStyle = "#000000";
+                ctx.fillStyle = "rgb(0, 0, 0)";
                 ctx.fillRect(text_size*x, text_size*y, text_size, text_size);
                 ctx.fillStyle = "rgb(0,"+i+",0)";
                 ctx.fillText(String.fromCharCode(Math.floor(Math.random()*254)), text_size*(x+0.5), (text_size)*(1+y));
+                //ctx.fillText('YPC', text_size*(x+0.5), (text_size)*(1+y));
+                
             }
             for(var yj; (yj = Next()).length > 0;)
             {
+                //console.log(yj);
                 var intensity = 0;
                 // update to upper
                 for(var yk = yj[0]-1; yk >= 0 && ymp[yk]-1 <= yj[1] && yj[1] < ymp[yk] + wavelength; yk --)
@@ -117,8 +122,7 @@ body {margin: 0;}
         }
     }
     console.log(ch);
-
-    (function MainLoop()
+        (function MainLoop()
     {
         // randomly add ripples
         for(var i = 0 ; i < maps.length ; i ++)
