@@ -55,6 +55,8 @@ body {margin: 0;}
 
     function UpdateFrame()
     {
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0,0, width, height);
         // update maps
         for(var xi = 0, yj ; xi < maps.length ; xi ++)
         {
@@ -88,7 +90,7 @@ body {margin: 0;}
             function decay(offset)
             {
                 if(offset == -1) return 0;
-                return (wavelength - offset)*255/wavelength;
+                return (offset)*255/wavelength;
             }
             function ac(cur_int, next_int)
             {
@@ -98,9 +100,7 @@ body {margin: 0;}
             {
                 i = Math.floor(i);
                 // clear prev char
-                ctx.fillStyle = "#000000";
-                ctx.fillRect(text_size*x, text_size*y, text_size, text_size);
-                ctx.fillStyle = "rgb(0,"+i+",0)";
+                ctx.fillStyle = (i>220?"rgb(200,255,200)":"rgb(0,"+i+",0)");
                 ctx.fillText(String.fromCharCode(Math.floor(Math.random()*254)), text_size*(x+0.5), (text_size)*(1+y));
             }
             for(var yj; (yj = Next()).length > 0;)
@@ -117,20 +117,16 @@ body {margin: 0;}
         }
     }
     console.log(ch);
+    RippleAt(0,-10);
 
     (function MainLoop()
     {
         // randomly add ripples
         for(var i = 0 ; i < maps.length ; i ++)
             if(Math.random()*10 < 1)
-                RippleAt(i, 0);
-            /*
-            if(maps[i].length <= 2)
-            {
-            }
-            */
+                RippleAt(i, -10);
         UpdateFrame();
-        setTimeout(MainLoop, 200);
+        setTimeout(MainLoop, 100);
     })();
 
 })(document.getElementsByTagName('body')[0]);
