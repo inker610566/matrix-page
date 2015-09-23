@@ -1,7 +1,7 @@
 Demo
 ========
 
-	http://in1.csie.ncu.edu.tw/~103525004/gen.html		
+        * js-version: http://inker610566.github.io/matrix-page/
 
 Requirement
 ===========
