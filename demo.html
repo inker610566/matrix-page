@@ -12,9 +12,9 @@ body {margin: 0;}
 // create an auto resize 
 (function Install(element)
 {
-    console.log(element.offsetHeight);
-    console.log(element.offsetWidth);
-    var width = element.offsetWidth, height = element.offsetHeight;
+    console.log(element.clientHeight);
+    console.log(element.clientWidth);
+    var width = element.clientWidth, height = element.clientHeight;
     // install canvas
     var canvas = document.createElement('canvas');
     canvas.style.position = 'absolute';
@@ -26,7 +26,7 @@ body {margin: 0;}
     //var ripples = [];
     var text_size = 10;
     var wavelength = 10;
-    var ch = Math.floor(element.offsetHeight/text_size)+1;
+    var ch = Math.floor(height/text_size)+1;
 
     // prepare data structure
     var maps = []; // in sorted order
